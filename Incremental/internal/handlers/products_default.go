@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"clase-02/internal"
+	"clase-02/web"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -52,7 +53,7 @@ func (d *DefaultProducts) GetById() http.HandlerFunc {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid id")
+			web.Error(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
 
@@ -61,10 +62,10 @@ func (d *DefaultProducts) GetById() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, internal.ErrProductNotFound):
-				response.Error(w, http.StatusNotFound, "Product not found")
+				web.Error(w, http.StatusNotFound, "Product not found")
 			default:
 				//fmt.Println(err)
-				response.Error(w, http.StatusInternalServerError, "Internal error in handling the request")
+				web.Error(w, http.StatusInternalServerError, "Internal error in handling the request")
 			}
 			return
 		}
@@ -94,9 +95,7 @@ func (d *DefaultProducts) Create() http.HandlerFunc {
 		var body BodyRequestProductJSON
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "text/plain")
-			w.Write([]byte("Invalid body"))
+			web.Error(w, http.StatusBadRequest, "Invalid body")
 			return
 		}
 
@@ -114,9 +113,7 @@ func (d *DefaultProducts) Create() http.HandlerFunc {
 		//Checking errors on the service
 
 		if err := d.sv.Save(&product); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "text/plain")
-			w.Write([]byte(err.Error()))
+			web.Error(w, http.StatusBadRequest, "unable to create the product")
 			return
 		}
 
@@ -132,9 +129,7 @@ func (d *DefaultProducts) Create() http.HandlerFunc {
 			Price:       product.Price,
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]any{
+		response.JSON(w, http.StatusCreated, map[string]any{
 			"message": "Product created",
 			"data":    data,
 		})
@@ -146,9 +141,7 @@ func (d *DefaultProducts) GetAll() http.HandlerFunc {
 		// Fetch all products from the service
 		products, err := d.sv.GetAll()
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Header().Set("Content-Type", "text/plain")
-			w.Write([]byte(err.Error()))
+			web.Error(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
 
@@ -168,9 +161,7 @@ func (d *DefaultProducts) GetAll() http.HandlerFunc {
 		}
 
 		// Response
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		response.JSON(w, http.StatusOK, map[string]interface{}{
 			"message": "products fetched",
 			"data":    responseData,
 		})
@@ -183,19 +174,14 @@ func (d *DefaultProducts) Update() http.HandlerFunc {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": "Invalid id",
-				"data":    nil,
-			})
+			web.Error(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
 
 		bytes, err := io.ReadAll(r.Body)
 
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"error": "Invalid body",
-			})
+			web.Error(w, http.StatusBadRequest, "Invalid body")
 			return
 		}
 
@@ -203,9 +189,7 @@ func (d *DefaultProducts) Update() http.HandlerFunc {
 
 		if err := json.Unmarshal(bytes, &bodyMap); err != nil {
 
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"error": "Invalid body",
-			})
+			web.Error(w, http.StatusBadRequest, "Invalid body")
 			return
 		}
 
@@ -213,17 +197,13 @@ func (d *DefaultProducts) Update() http.HandlerFunc {
 
 		if err := ValidateKeyExistence(bodyMap, PossibleRequestFields); err != nil {
 
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"error": "invalid body",
-			})
+			web.Error(w, http.StatusBadRequest, "invalid body")
 			return
 		}
 
 		var body BodyRequestProductJSON
 		if err := json.Unmarshal(bytes, &body); err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"Error": "Invalid body",
-			})
+			web.Error(w, http.StatusBadRequest, "invalid body")
 			return
 		}
 
@@ -240,17 +220,11 @@ func (d *DefaultProducts) Update() http.HandlerFunc {
 		if err := d.sv.Update(&product); err != nil {
 			switch {
 			case errors.Is(err, internal.ErrProductNotFound):
-				response.JSON(w, http.StatusNotFound, map[string]any{
-					"Error": "Product not found",
-				})
+				web.Error(w, http.StatusNotFound, "Product not found")
 			case errors.Is(err, internal.ErrFieldRequired):
-				response.JSON(w, http.StatusBadRequest, map[string]any{
-					"Error": "Invalid body",
-				})
+				web.Error(w, http.StatusBadRequest, "Invalid body")
 			default:
-				response.JSON(w, http.StatusInternalServerError, map[string]any{
-					"Error": "Internal server error",
-				})
+				web.Error(w, http.StatusInternalServerError, "Internal server error")
 			}
 			return
 		}
@@ -276,26 +250,23 @@ func (d *DefaultProducts) Update() http.HandlerFunc {
 func (d *DefaultProducts) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]any{
-				"message": "Invalid id",
-				"data":    nil,
-			})
+			web.Error(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
 
 		if err := d.sv.Delete(id); err != nil {
 			switch {
 			case errors.Is(err, internal.ErrProductNotFound):
-				response.Text(w, http.StatusNotFound, "product not found")
-
+				web.Error(w, http.StatusNotFound, "product not found")
 			default:
-				response.Text(w, http.StatusInternalServerError, "Internal error")
+				web.Error(w, http.StatusInternalServerError, "Internal error")
 			}
 			return
 		}
 
-		response.JSON(w, http.StatusBadRequest, map[string]any{
+		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "Movie deleted",
 		})
 	}
@@ -307,7 +278,7 @@ func (d *DefaultProducts) UpdatePartial() http.HandlerFunc {
 
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.Text(w, http.StatusBadRequest, "invalid id")
+			web.Error(w, http.StatusBadRequest, "invalid id")
 			return
 		}
 
@@ -315,9 +286,9 @@ func (d *DefaultProducts) UpdatePartial() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, internal.ErrProductNotFound):
-				response.Text(w, http.StatusNotFound, "product not found")
+				web.Error(w, http.StatusNotFound, "product not found")
 			default:
-				response.Text(w, http.StatusInternalServerError, "internal server error")
+				web.Error(w, http.StatusInternalServerError, "internal server error")
 			}
 			return
 		}
@@ -335,7 +306,7 @@ func (d *DefaultProducts) UpdatePartial() http.HandlerFunc {
 
 		// - get body
 		if err := request.JSON(r, &reqBody); err != nil {
-			response.Text(w, http.StatusBadRequest, "invalid body")
+			web.Error(w, http.StatusBadRequest, "invalid body")
 			return
 		}
 
@@ -354,11 +325,11 @@ func (d *DefaultProducts) UpdatePartial() http.HandlerFunc {
 		if err := d.sv.Update(&product); err != nil {
 			switch {
 			case errors.Is(err, internal.ErrProductNotFound):
-				response.Text(w, http.StatusNotFound, "movie not found")
+				web.Error(w, http.StatusNotFound, "movie not found")
 			case errors.Is(err, internal.ErrFieldRequired), errors.Is(err, internal.ErrFieldQuality):
-				response.Text(w, http.StatusBadRequest, "invalid body")
+				web.Error(w, http.StatusBadRequest, "invalid body")
 			default:
-				response.Text(w, http.StatusInternalServerError, "internal server error")
+				web.Error(w, http.StatusInternalServerError, "internal server error")
 			}
 			return
 		}

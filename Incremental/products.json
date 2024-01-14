@@ -1,7 +1,7 @@
 [
     {
         "Id": 1,
-        "Name": "Updated product 1 again",
+        "Name": "Cookies!",
         "Quantity": 12,
         "CodeValue": "9495",
         "IsPublished": true,
@@ -4493,6 +4493,24 @@
     {
         "Id": 501,
         "Name": "New Producto!!!",
+        "Quantity": 12,
+        "CodeValue": "9495",
+        "IsPublished": true,
+        "Expiration": "2024-12-31",
+        "Price": 19.99
+    },
+    {
+        "Id": 501,
+        "Name": "Un nuevo product",
+        "Quantity": 12,
+        "CodeValue": "9495",
+        "IsPublished": true,
+        "Expiration": "2024-12-31",
+        "Price": 19.99
+    },
+    {
+        "Id": 502,
+        "Name": "Un nuevo productito",
         "Quantity": 12,
         "CodeValue": "9495",
         "IsPublished": true,
