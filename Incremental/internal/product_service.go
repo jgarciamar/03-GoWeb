@@ -6,6 +6,7 @@ var (
 	ErrFieldRequired        = errors.New("Field Required!!!")
 	ErrFieldQuality         = errors.New("Field quality")
 	ErrProductAlreadyExists = errors.New("Product already exists")
+	ErrProductDoesNotExist  = errors.New("Product not found")
 )
 
 type ProductService interface {

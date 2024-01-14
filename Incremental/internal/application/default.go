@@ -1,14 +1,11 @@
 package application
 
 import (
-	"clase-02/internal"
-	"clase-02/internal/handler"
+	"clase-02/internal/handlers"
 	"clase-02/internal/repository"
 	"clase-02/internal/service"
-	"encoding/json"
-	"fmt"
+	"clase-02/internal/storage"
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi"
 )
@@ -23,6 +20,8 @@ type DefaultHTTP struct {
 	addr string
 }
 
+// Old Get Map Code
+/*
 func GetProductsFromJSON(jsonPath string) (map[int]internal.Product, error) {
 	defaultFilePath := jsonPath
 
@@ -54,21 +53,17 @@ func GetProductsFromJSON(jsonPath string) (map[int]internal.Product, error) {
 
 	return productMap, nil
 }
+*/
 
 func (h *DefaultHTTP) Run() (err error) {
 
-	JSONProductsMap, err := GetProductsFromJSON("products.json")
+	JSONStorage := storage.NewStorageProductJSON("products.json")
 
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+	newRP := repository.NewRepositoryProductStore(JSONStorage, 500)
 
-	rp := repository.NewProductMap(JSONProductsMap, len(JSONProductsMap)-1)
+	sv := service.NewProductDefault(newRP)
 
-	sv := service.NewProductDefault(rp)
-
-	hd := handler.NewDefaultProducts(sv)
+	hd := handlers.NewDefaultProducts(sv)
 
 	rt := chi.NewRouter()
 

@@ -37,7 +37,7 @@ func (p *ProductDefault) Save(product *internal.Product) (err error) {
 		return fmt.Errorf("%w: price", internal.ErrFieldRequired)
 	}
 
-	err = p.rp.Save(product)
+	err = p.rp.Create(product)
 
 	// We now check errors returned by the repo
 
@@ -73,7 +73,11 @@ func (p *ProductDefault) GetById(id int) (product internal.Product, err error) {
 		switch err {
 		case internal.ErrProductNotFound:
 			err = fmt.Errorf("%w: id", internal.ErrProductNotFound)
+		default:
+			fmt.Println(err)
+			err = fmt.Errorf("Error in Service")
 		}
+
 		return
 	}
 	return

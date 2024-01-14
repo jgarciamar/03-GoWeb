@@ -4,20 +4,20 @@ import "clase-02/internal"
 
 type ProductMap struct {
 	db     map[int]internal.Product
-	lastId int
+	lastID int
 }
 
-func NewProductMap(db map[int]internal.Product, lastId int) *ProductMap {
+func NewProductMap(db map[int]internal.Product, lastID int) *ProductMap {
 	//default config and values
 	//...
 
 	return &ProductMap{
 		db:     db,
-		lastId: lastId,
+		lastID: lastID,
 	}
 }
 
-func (p *ProductMap) Save(product *internal.Product) (err error) {
+func (p *ProductMap) Create(product *internal.Product) (err error) {
 
 	for _, v := range (*p).db {
 
@@ -27,9 +27,9 @@ func (p *ProductMap) Save(product *internal.Product) (err error) {
 
 	}
 
-	(*p).lastId++
+	(*p).lastID++
 
-	(*product).Id = (*p).lastId
+	(*product).Id = (*p).lastID
 
 	// Store
 
@@ -37,8 +37,6 @@ func (p *ProductMap) Save(product *internal.Product) (err error) {
 
 	return nil
 }
-
-//GetAll() (products []*Product, err error)
 
 func (p *ProductMap) GetAll() (products []internal.Product, err error) {
 
