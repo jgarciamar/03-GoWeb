@@ -247,6 +247,8 @@ func (d *DefaultProducts) Update() http.HandlerFunc {
 
 }
 
+// Delete delates a product from the db
+// It returns a 200 if the product was deleted successfully
 func (d *DefaultProducts) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -267,7 +269,7 @@ func (d *DefaultProducts) Delete() http.HandlerFunc {
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Movie deleted",
+			"message": "Product deleted",
 		})
 	}
 }
