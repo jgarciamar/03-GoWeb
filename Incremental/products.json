@@ -4516,5 +4516,23 @@
         "IsPublished": true,
         "Expiration": "2024-12-31",
         "Price": 19.99
+    },
+    {
+        "Id": 501,
+        "Name": "Un nuevo productillo",
+        "Quantity": 12,
+        "CodeValue": "9495",
+        "IsPublished": true,
+        "Expiration": "2024-12-31",
+        "Price": 19.99
+    },
+    {
+        "Id": 501,
+        "Name": "Un nuevo",
+        "Quantity": 12,
+        "CodeValue": "9495",
+        "IsPublished": true,
+        "Expiration": "2024-12-31",
+        "Price": 19.99
     }
 ]

@@ -5,6 +5,7 @@ import (
 	"clase-02/internal/repository"
 	"clase-02/internal/service"
 	"clase-02/internal/storage"
+	"clase-02/middleware"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -67,6 +68,8 @@ func (h *DefaultHTTP) Run() (err error) {
 
 	rt := chi.NewRouter()
 
+	logger := middleware.NewLogger()
+	rt.Use(logger.Log)
 	rt.Route("/products", func(rt chi.Router) {
 
 		rt.Post("/", hd.Create())

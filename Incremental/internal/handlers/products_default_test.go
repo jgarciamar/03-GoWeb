@@ -175,7 +175,7 @@ func TestProductsDefault_DeleteProduct(t *testing.T) {
 
 	//Assert
 
-	expectedCode := http.StatusOK
+	expectedCode := http.StatusNoContent
 	expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
 	expectedBody := `{
 		"message": "Product deleted"

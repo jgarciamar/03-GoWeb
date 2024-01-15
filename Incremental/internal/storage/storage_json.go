@@ -45,7 +45,7 @@ func (s *StorageProductJSON) ReadAll() (products []internal.Product, err error) 
 		return products, err
 	}
 
-	fmt.Println("Products from JSONFile have been readed into memory")
+	//fmt.Println("Products from JSONFile have been readed into memory")
 
 	return products, nil
 }
@@ -70,7 +70,7 @@ func (s *StorageProductJSON) WriteAll(products []internal.Product) (err error) {
 		return err
 	}
 
-	fmt.Println("Products have been written to JSON file")
+	//fmt.Println("Products have been written to JSON file")
 
 	return nil
 }
