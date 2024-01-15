@@ -68,8 +68,16 @@ func (h *DefaultHTTP) Run() (err error) {
 
 	rt := chi.NewRouter()
 
+	//Middlewares
+
+	authenticator := middleware.NewAuthenticator("")
 	logger := middleware.NewLogger()
+
 	rt.Use(logger.Log)
+	rt.Use(authenticator.Authenticate)
+
+	//Routes
+
 	rt.Route("/products", func(rt chi.Router) {
 
 		rt.Post("/", hd.Create())
